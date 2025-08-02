@@ -29,3 +29,8 @@ Del relevamiento preliminar se identificaron los siguientes requisitos:
 
 - Lenguaje: C# 12.0
 - Plataforma: .NET 8
+# DSW2025 TPI - Backend
+
+## Integrantes
+- Santiago Ezequiel Valdez 52676 (desarrollo backend y configuración)  
+- Valentina Bugeau 53133 (validaciones, pruebas y documentación)
