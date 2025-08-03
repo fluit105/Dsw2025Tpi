@@ -22,7 +22,9 @@ public class OrderItem : EntityBase
       public required Customer Product { get; set; }
 
       // Constructor parameterless requerido para que EF Core pueda instanciar durante materialización.
+#pragma warning disable CS8618
       public OrderItem() { }
+#pragma warning restore CS8618
 
       // Constructor de conveniencia para armar el ítem con sus referencias y valores clave.
       public OrderItem(Guid productId, Guid orderId, int quantity, decimal currentunitPrice)

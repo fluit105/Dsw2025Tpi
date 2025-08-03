@@ -20,7 +20,9 @@ public class Product : EntityBase
       public List<OrderItem>? OrderItems { get; set; }
 
       // Constructor requerido por EF Core para materialización.
+#pragma warning disable CS8618
       protected Product() { }
+#pragma warning restore CS8618
 
       // Creación explícita con los datos base necesarios para tener un producto consistente.
       public Product(string sku, string internalCode, string description, string name, decimal currentunitPrice, int stockQuantity)

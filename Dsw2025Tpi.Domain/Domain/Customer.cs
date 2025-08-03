@@ -6,7 +6,9 @@ namespace Dsw2025Tpi.Domain.Domain;
 public class Customer : EntityBase
 {
       // Necesario para que EF Core pueda instanciar al hidratar desde la base.
+#pragma warning disable CS8618
       public Customer() { }
+#pragma warning restore CS8618
 
       // Forma clara de crear un cliente con sus datos principales.
       public Customer(string email, string name, string phoneNumber)
