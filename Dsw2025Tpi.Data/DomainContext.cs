@@ -1,6 +1,8 @@
 ﻿using Dsw2025Tpi.Domain.Domain;
 using Microsoft.EntityFrameworkCore;
 
+namespace Dsw2025Tpi.Data;
+
 public class DomainContext : DbContext
 {
       public DomainContext(DbContextOptions<DomainContext> options) : base(options) { }
