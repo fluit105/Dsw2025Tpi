@@ -7,10 +7,10 @@ namespace Dsw2025Tpi.Domain.Interfaces;
 // Permite desacoplar la lógica de negocio / aplicación de la persistencia concreta.
 public interface IRepository
 {
-      // Recupera por Id, opcionalmente incluyendo relaciones (ej: "Orders", "Customer").
+      // Recupera por Id.
       Task<T?> GetById<T>(Guid id, params string[] include) where T : EntityBase;
 
-      // Devuelve el primer elemento que cumpla un predicado, con includes opcionales.
+      // Devuelve el primer elemento que cumpla un predicado.
       Task<T?> First<T>(Expression<Func<T, bool>> predicate, params string[] include) where T : EntityBase;
 
       // Recupera todos los elementos que coincidan con una condición dada.
