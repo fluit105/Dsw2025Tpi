@@ -1,5 +1,6 @@
 ﻿using Dsw2025Tpi.Domain.Domain;
-using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace Dsw2025Tpi.Application.Dtos;
 

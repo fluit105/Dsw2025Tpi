@@ -8,7 +8,7 @@ namespace Dsw2025Tpi.Data.Context;
 // DbContext especializado para ASP.NET Core Identity.
 // Maneja la persistencia de usuarios, roles y toda la información
 // de autenticación/autorización.
-public class AuthenticateContext : IdentityDbContext<IdentityUserCustomerDTO, IdentityRole, string>
+public class AuthenticateContext : IdentityDbContext<IdentityUserCustomerDto, IdentityRole, string>
 {
       // Recibe la configuración (cadena de conexión, proveedor, etc.)
       // desde Program.cs mediante inyección de dependencias.
@@ -22,7 +22,7 @@ public class AuthenticateContext : IdentityDbContext<IdentityUserCustomerDTO, Id
 
             // Renombrar tablas por defecto de Identity para que tengan
             // nombres personalizados más claros en la base de datos.
-            builder.Entity<IdentityUserCustomerDTO>   (b => { b.ToTable("Usuarios"); });
+            builder.Entity<IdentityUserCustomerDto>   (b => { b.ToTable("Usuarios"); });
             builder.Entity<IdentityRole>              (b => { b.ToTable("Roles"); });
             builder.Entity<IdentityUserRole<string>>  (b => { b.ToTable("UsuarioRoles"); });
             builder.Entity<IdentityUserClaim<string>> (b => { b.ToTable("UsuarioClaims"); });

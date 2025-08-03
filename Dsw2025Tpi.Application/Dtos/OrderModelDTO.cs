@@ -17,7 +17,7 @@ public record OrderModelDto
           Guid customerId,
           string shippingAddress,
           string billingAddress,
-          List<ProductModelDTO.ProductRequest> Products
+          List<ProductModelDto.ProductRequest> Products
       );
 
       // Petición para filtrar órdenes en consultas/listados.
@@ -38,7 +38,7 @@ public record OrderModelDto
           string billingAddress,
           string notes,
           decimal totalmount,
-          List<OrderItemsModelDTO.OrderItemResponse> OrderItems,
+          List<OrderItemsModelDto.OrderItemResponse> OrderItems,
           OrderStatus OrderStatus
       );
 }
