@@ -3,7 +3,7 @@
 namespace Dsw2025Tpi.Application.Dtos;
 
 // DTO agrupador para representar distintas vistas de los ítems de una orden.
-public record OrderItemsModel
+public record OrderItemsModelDto
 {
       // Representación completa de un ítem de orden.
       // Incluye IDs de producto y orden, cantidad y precio unitario.

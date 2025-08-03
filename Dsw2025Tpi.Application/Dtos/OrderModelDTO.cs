@@ -6,7 +6,7 @@ namespace Dsw2025Tpi.Application.Dtos;
 
 // DTO maestro para manejo de órdenes en la API.
 // Agrupa todos los sub-modelos necesarios para crear, actualizar, filtrar y devolver órdenes.
-public record OrderModel
+public record OrderModelDto
 {
       // Petición para actualizar el estado de una orden.
       public record OrderStatusUpdateRequest(OrderStatus OrderStatus);
@@ -38,7 +38,7 @@ public record OrderModel
           string billingAddress,
           string notes,
           decimal totalmount,
-          List<OrderItemsModel.OrderItemResponse> OrderItems,
+          List<OrderItemsModelDTO.OrderItemResponse> OrderItems,
           OrderStatus OrderStatus
       );
 }

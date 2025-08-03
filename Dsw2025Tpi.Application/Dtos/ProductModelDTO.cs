@@ -4,7 +4,7 @@ namespace Dsw2025Tpi.Application.Dtos;
 
 // DTO maestro para productos en la API.
 // Agrupa variantes para solicitudes y respuestas con distintos niveles de detalle.
-public record ProductModel
+public record ProductModelDto
 {
       // Petición de producto para usar dentro de un pedido/orden.
       // Incluye cantidad solicitada y algunos datos del producto.

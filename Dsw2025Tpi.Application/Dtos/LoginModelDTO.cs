@@ -4,7 +4,7 @@ namespace Dsw2025Tpi.Application.Dtos;
 
 // DTO para el inicio de sesión de un usuario.
 // Se envía desde el cliente a la API con las credenciales.
-public record LoginModel(
+public record LoginModelDto(
     // Nombre de usuario o identificador para iniciar sesión.
     string UserName,
 
