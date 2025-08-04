@@ -13,7 +13,7 @@ public class Order : EntityBase
       public string ShippingAddress { get; set; }
       public string BillingAddress { get; set; }
 
-      public string? Notes { get; set; }
+      public string Notes { get; set; }
 
       // Derivado de OrderItems en el flujo de negocio.
       public decimal TotalAmount { get; set; }

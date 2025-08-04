@@ -18,8 +18,8 @@ public class OrderItem : EntityBase
       public decimal Subtotal => Quantity * UnitPrice;
 
       // Navegación para cuando se cargan relaciones completas.
-      public required Customer Order { get; set; }
-      public required Customer Product { get; set; }
+      public required Order Order { get; set; }
+      public required Product Product { get; set; }
 
       // Constructor parameterless requerido para que EF Core pueda instanciar durante materialización.
 #pragma warning disable CS8618
