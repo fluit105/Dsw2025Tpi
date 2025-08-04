@@ -13,6 +13,7 @@ public class OrderManagementsService : IOrderManagementsService
 {
       private readonly IRepository _repository;
 
+      // Internamente desde Program.cs se inyecta un EFRepository que implementa IRepository.
       public OrderManagementsService(IRepository repository)
       {
             _repository = repository;
@@ -27,7 +28,7 @@ public class OrderManagementsService : IOrderManagementsService
                   throw new NotExistException($"No existe el Customer con id {request.customerId}");
 
             // Validar direcciones de envío/facturación
-            if (IsValid(request))
+            if (IsAddressValid(request))
                   throw new ArgumentException("Valores de Dirección no válidos");
 
             // Validar que haya productos en la orden
@@ -63,7 +64,7 @@ public class OrderManagementsService : IOrderManagementsService
       }
 
       // Valida que direcciones no estén vacías (true = inválido)
-      private static bool IsValid(OrderModelDto.OrderRequest request) =>
+      private static bool IsAddressValid(OrderModelDto.OrderRequest request) =>
           string.IsNullOrEmpty(request.shippingAddress) ||
           string.IsNullOrEmpty(request.billingAddress);
 

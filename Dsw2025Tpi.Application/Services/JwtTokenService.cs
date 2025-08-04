@@ -12,8 +12,9 @@ public class JwtTokenService : IJwtTokenService
 {
       private readonly IConfiguration _config;
 
-      // Recibe IConfiguration por inyección de dependencias
-      // para poder leer la configuración desde appsettings.json.
+      // Recibe IConfiguration por inyección de dependencias para poder leer la configuración
+      // desde appsettings.json.
+      // Internamente desde Program.cs se inyecta un EFRepository que implementa IRepository.
       public JwtTokenService(IConfiguration config)
       {
             _config = config ?? throw new ArgumentNullException(nameof(config));
