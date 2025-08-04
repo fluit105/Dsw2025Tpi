@@ -132,7 +132,7 @@ public class OrderManagementsService : IOrderManagementsService
 
             // Validar que el estado sea uno de los definidos en el enum OrderStatus
             if (!Enum.IsDefined(typeof(OrderStatus), request.OrderStatus))
-                  throw new NotEstateExistException($"El estado de la orden {request.OrderStatus} no es válido");
+                  throw new NotExistStatusException($"El estado de la orden {request.OrderStatus} no es válido");
 
             // Actualizar estado
             order.OrderStatus = request.OrderStatus;
@@ -165,7 +165,7 @@ public class OrderManagementsService : IOrderManagementsService
             // Construir predicado dinámico para filtrar resultados
             Expression<Func<Order, bool>> predicate = o =>
                 (!request.OrderStatus.HasValue || o.OrderStatus == request.OrderStatus.Value) &&
-                (!request.CustomerId.HasValue || o.CustomerId == request.CustomerId.Value);
+                (!request.CustomerId.HasValue  || o.CustomerId  == request.CustomerId.Value);
 
             // Consultar con includes para traer los ítems de la orden
             var orders = await _repository.GetFiltered<Order>(predicate, "orderItems");
