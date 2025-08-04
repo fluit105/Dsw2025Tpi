@@ -132,7 +132,7 @@ public class OrderManagementsService : IOrderManagementsService
 
             // Validar que el estado sea uno de los definidos en el enum OrderStatus
             if (!Enum.IsDefined(typeof(OrderStatus), request.OrderStatus))
-                  throw new NotExistStatusException($"El estado de la orden {request.OrderStatus} no es válido");
+                  throw new NotExistOrderStatusException($"El estado de la orden {request.OrderStatus} no es válido");
 
             // Actualizar estado
             order.OrderStatus = request.OrderStatus;
