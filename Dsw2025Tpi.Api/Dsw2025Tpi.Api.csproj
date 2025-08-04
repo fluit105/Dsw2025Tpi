@@ -11,8 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\Dsw2025Tpi.Application\Dsw2025Tpi.Application.csproj" />
   </ItemGroup>
 
 </Project>
