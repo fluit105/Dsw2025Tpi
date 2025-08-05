@@ -18,90 +18,88 @@ public class DomainContext : DbContext
             // Configuración de Product
             modelBuilder.Entity<Product>(p =>
             {
-                  p.ToTable("Products");  // Nombre de la tabla
-                  p.Property(p => p.Sku)  // Propiedad SKU
-                      .IsRequired()       // Obligatorio
-                      .HasMaxLength(20)   // Máximo 20 caracteres
-                      .IsUnicode();       // Permitir caracteres Unicode
-                  p.Property(p => p.Id)   // Clave primaria
+                  p.ToTable("Products");
+                  p.Property(p => p.Sku)
+                      .IsRequired()
+                      .HasMaxLength(20)
+                      .IsUnicode();
+                  p.Property(p => p.Id)
                       .IsRequired();
-                  p.Property(p => p.Name) // Nombre del producto
+                  p.Property(p => p.Name)
                       .IsRequired()
                       .HasMaxLength(100);
 
-                  // Índice único para SKU
-                  p.HasIndex(x => x.Sku).IsUnique();
+                  // Configuración de precisión para evitar truncamientos
+                  p.Property(p => p.CurrentUnitPrice)
+                      .HasPrecision(18, 2); // 18 dígitos en total, 2 decimales
             });
 
             // Configuración de Order
             modelBuilder.Entity<Order>(o =>
             {
-                  o.ToTable("Orders");                  // Nombre de la tabla
-                  o.Property(o => o.CustomerId)         // FK al cliente
+                  o.ToTable("Orders");
+                  o.Property(o => o.CustomerId)
                       .IsRequired();
-                  o.HasKey(o => o.Id);                  // Clave primaria
+                  o.HasKey(o => o.Id);
 
-                  // Relación: Order -> Customer (muchas órdenes para un cliente)
                   o.HasOne(o => o.Customer)
                       .WithMany(c => c.Orders)
                       .HasForeignKey(o => o.CustomerId)
-                      .OnDelete(DeleteBehavior.Cascade); // Si se borra el cliente, borrar órdenes
+                      .OnDelete(DeleteBehavior.Cascade);
 
-                  o.Property(o => o.ShippingAddress)     // Dirección de envío
+                  o.Property(o => o.ShippingAddress)
                       .IsRequired()
                       .HasMaxLength(200);
-                  o.Property(o => o.BillingAddress)      // Dirección de facturación
+                  o.Property(o => o.BillingAddress)
                       .IsRequired()
                       .HasMaxLength(200);
-                  o.Property(o => o.TotalAmount)         // Total de la orden
-                      .IsRequired();
+
+                  o.Property(o => o.TotalAmount)
+                      .IsRequired()
+                      .HasPrecision(18, 2); // Precisión para montos totales
             });
 
             // Configuración de OrderItem
             modelBuilder.Entity<OrderItem>(oi =>
             {
-                  oi.ToTable("OrderItems");              // Nombre de la tabla
-                  oi.Property(oi => oi.ProductID)        // FK al producto
+                  oi.ToTable("OrderItems");
+                  oi.Property(oi => oi.ProductID)
                       .IsRequired();
-                  oi.HasKey(oi => oi.Id);                // Clave primaria
+                  oi.HasKey(oi => oi.Id);
 
-                  // Relación: OrderItem -> Product
                   oi.HasOne(oi => oi.Product)
                       .WithMany(p => p.OrderItems)
                       .HasForeignKey(oi => oi.ProductID)
-                      .OnDelete(DeleteBehavior.Cascade); // Si se borra el producto, borrar ítems
+                      .OnDelete(DeleteBehavior.Cascade);
 
-                  // Relación: OrderItem -> Order
                   oi.HasOne(oi => oi.Order)
                       .WithMany(o => o.OrderItems)
                       .HasForeignKey(oi => oi.OrderID)
-                      .OnDelete(DeleteBehavior.Cascade); // Si se borra la orden, borrar ítems
+                      .OnDelete(DeleteBehavior.Cascade);
 
-                  oi.Property(oi => oi.Quantity)         // Cantidad
+                  oi.Property(oi => oi.Quantity)
                       .IsRequired();
-                  oi.Property(oi => oi.UnitPrice)        // Precio unitario
-                      .IsRequired();
+                  oi.Property(oi => oi.UnitPrice)
+                      .IsRequired()
+                      .HasPrecision(18, 2); // Precisión para precios unitarios
             });
 
             // Configuración de Customer
             modelBuilder.Entity<Customer>(c =>
             {
-                  c.ToTable("Customers");        // Nombre de la tabla
-                  c.Property(c => c.Name)        // Nombre del cliente
+                  c.ToTable("Customers");
+                  c.Property(c => c.Name)
                       .IsRequired()
                       .HasMaxLength(100);
-                  c.Property(c => c.Id)          // Clave primaria
+                  c.Property(c => c.Id)
                       .IsRequired();
-                  c.Property(c => c.Email)       // Email del cliente
+                  c.Property(c => c.Email)
                       .IsRequired()
                       .HasMaxLength(100)
-                      .IsUnicode(false);         // ASCII
-                  c.Property(c => c.PhoneNumber) // Teléfono
+                      .IsUnicode(false);
+                  c.Property(c => c.PhoneNumber)
                       .HasMaxLength(15)
                       .IsUnicode(false);
-
-                  // Índice único para Email
-                  c.HasIndex(x => x.Email).IsUnique();
             });
       }
 }
