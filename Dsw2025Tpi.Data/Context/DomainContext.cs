@@ -1,7 +1,7 @@
 ﻿using Dsw2025Tpi.Domain.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Dsw2025Tpi.Data;
+namespace Dsw2025Tpi.Data.Context;
 
 public class DomainContext : DbContext
 {
