@@ -1,0 +1,12 @@
+[
+      {
+            "Email": "admin@ejemplo.com",
+            "Name": "Administrador",
+            "PhoneNumber": "000000000"
+      },
+      {
+            "Email": "user@ejemplo.com",
+            "Name": "Cliente Demo",
+            "PhoneNumber": "111111111"
+      }
+]
