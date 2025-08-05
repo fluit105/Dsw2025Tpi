@@ -31,7 +31,7 @@ public class DomainContext : DbContext
 
                   // Configuración de precisión para evitar truncamientos
                   p.Property(p => p.CurrentUnitPrice)
-                      .HasPrecision(18, 2); // 18 dígitos en total, 2 decimales
+                      .HasPrecision(18, 2);
             });
 
             // Configuración de Order
@@ -56,7 +56,7 @@ public class DomainContext : DbContext
 
                   o.Property(o => o.TotalAmount)
                       .IsRequired()
-                      .HasPrecision(18, 2); // Precisión para montos totales
+                      .HasPrecision(18, 2);
             });
 
             // Configuración de OrderItem
@@ -81,7 +81,7 @@ public class DomainContext : DbContext
                       .IsRequired();
                   oi.Property(oi => oi.UnitPrice)
                       .IsRequired()
-                      .HasPrecision(18, 2); // Precisión para precios unitarios
+                      .HasPrecision(18, 2);
             });
 
             // Configuración de Customer
