@@ -3,7 +3,6 @@ using Dsw2025Tpi.Application.Interfaces;             // Interfaces de servicios 
 using Dsw2025Tpi.Application.Services;               // Implementaciones de servicios de la capa Application
 using Dsw2025Tpi.Data.Context;                       // Contexto de autenticación (Identity)
 using Dsw2025Tpi.Data.Repositories;                  // Implementación de repositorios
-using Dsw2025Tpi.Data.Seeding;
 using Dsw2025Tpi.Domain.Interfaces;                  // Interfaces del dominio
 using Microsoft.AspNetCore.Authentication.JwtBearer; // Autenticación JWT
 using Microsoft.AspNetCore.Identity;                 // ASP.NET Core Identity
@@ -11,13 +10,15 @@ using Microsoft.EntityFrameworkCore;                 // Entity Framework Core
 using Microsoft.IdentityModel.Tokens;                // Configuración de validación de tokens JWT
 using Microsoft.OpenApi.Models;                      // Swagger y OpenAPI
 using System.Text;                                   // Codificación para claves JWT
-using Volo.Abp.Data;                                 // ABP Framework para uso de seeds
+using System.Threading.RateLimiting;                 // Limitación de tasa para proteger la API
+using Microsoft.AspNetCore.RateLimiting;             // Limitación de tasa para ASP.NET Core
+using AspNetCoreRateLimit;                           // Biblioteca para limitación de tasa por IP
 
 namespace Dsw2025Tpi.Api;
 
 public static class Program
 {
-      public static async Task Main(string[] args) // Lo hago async para poder ejecutar seeding con await
+      public static void Main(string[] args) // Lo hago async para poder ejecutar seeding con await
       {
             var builder = WebApplication.CreateBuilder(args);
             // Crea el objeto principal de configuración de la aplicación.
@@ -25,6 +26,35 @@ public static class Program
             // Prepara el servidor web (Kestrel) y sistema de logging.
             // Expone "builder.Services" para registrar servicios en el contenedor de DI.
             // Expone "builder.Configuration" y "builder.Environment" para acceder a config y entorno.
+
+            builder.Services.AddRateLimiter(options =>
+            {
+                  // Código de rechazo cuando supere el límite
+                  options.RejectionStatusCode = 429;
+
+                  // Política global por IP: 10 peticiones / 10 segundos por dirección IP
+                  options.GlobalLimiter = PartitionedRateLimiter.CreateChained(
+                        // Particionar por IP
+                        PartitionedRateLimiter.Create<HttpContext, string>(context =>
+                        {
+                              // Clave = la IP remota
+                              var ip = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+                              // Cada partición (IP) tiene su propia ventana fija
+                              return RateLimitPartition.GetFixedWindowLimiter(
+                                    partitionKey: ip,
+                                    factory: partition => new FixedWindowRateLimiterOptions
+                                    {
+                                          PermitLimit = 10,
+                                          Window = TimeSpan.FromSeconds(10),
+                                          QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                                          QueueLimit = 0
+                                    }
+                              );
+                        })
+                  );
+            });
+
 
             // Definir un nombre para la política
             const string CorsPolicyName = "CorsPolicy";
@@ -35,12 +65,12 @@ public static class Program
                   {
                         policy
                           .WithOrigins(
-                            "https://mi-frontend.com",      // dominio de producción
-                            "https://localhost:4200"       // dominio de desarrollo (Angular, React, etc.)
+                            "https://mi-frontend.com",     // Dominio de producción
+                            "https://localhost:4200"       // Dominio de desarrollo (Angular, React, etc.)
                           )
-                          .AllowAnyHeader()                // permitir todos los encabezados que tu cliente necesite
-                          .AllowAnyMethod()                // permitir GET, POST, PUT, PATCH, DELETE…
-                          .AllowCredentials();             // solo si usas cookies o autenticación basada en credenciales
+                          .AllowAnyHeader()                // Permitir todos los encabezados que tu cliente necesite
+                          .AllowAnyMethod()                // Permitir GET, POST, PUT, PATCH, DELETE…
+                          .AllowCredentials();             // Solo si usas cookies o autenticación basada en credenciales
                   });
             });
 
@@ -146,16 +176,6 @@ public static class Program
             app.UseAuthorization();
             app.MapControllers();
             app.MapHealthChecks("/healthcheck");
-
-            // Ejecutamos el seeding de datos solo en modo Development
-            if (app.Environment.IsDevelopment())
-            {
-                  using (var scope = app.Services.CreateScope())
-                  {
-                        var dataSeeder = scope.ServiceProvider.GetRequiredService<IDataSeeder>();
-                        await dataSeeder.SeedAsync();
-                  }
-            }
 
 #pragma warning disable S6966
             app.Run();
