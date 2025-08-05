@@ -1,11 +1,13 @@
 ﻿using Dsw2025Tpi.Application.Dtos;        // DTOs para entrada/salida de datos de producto
-using Dsw2025Tpi.Application.Exceptions; // Excepciones personalizadas como DuplicatedEntityException
-using Dsw2025Tpi.Application.Interfaces; // Interfaces de servicios de la capa Application
-using Dsw2025Tpi.Domain.Domain;          // Entidades de dominio como Product
-using Microsoft.AspNetCore.Mvc;          // Funcionalidades de controladores y atributos de rutas
+using Dsw2025Tpi.Application.Exceptions;  // Excepciones personalizadas como DuplicatedEntityException
+using Dsw2025Tpi.Application.Interfaces;  // Interfaces de servicios de la capa Application
+using Dsw2025Tpi.Domain.Domain;           // Entidades de dominio como Product
+using Microsoft.AspNetCore.Mvc;           // Funcionalidades de controladores y atributos de rutas
+using Microsoft.AspNetCore.Authorization; // Autorización para proteger los endpoints
 
 namespace Dsw2025Tpi.Api.Controllers;
 
+[Authorize]
 [Route("api/products")] // Ruta base de este controlador
 [ApiController] // Habilita comportamiento automático de API REST
 public class ProductController : ControllerBase

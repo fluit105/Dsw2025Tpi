@@ -78,7 +78,8 @@ public class OrderControler : ControllerBase
             }
       }
 
-      [HttpPut("{id}/status")] // Indica que este endpoint responde a PUT en /api/orders/{id}/status
+      [HttpPut("{id}/status")]     // Indica que este endpoint responde a PUT en /api/orders/{id}/status
+      [Authorize(Roles = "Admin")] // Solo usuarios con rol Admin pueden actualizar el estado de la orden
       public async Task<IActionResult> UpdateOrderStatus(Guid id, [FromBody] OrderModelDto.OrderStatusUpdateRequest request)
       {
             try
