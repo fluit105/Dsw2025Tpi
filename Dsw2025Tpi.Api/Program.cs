@@ -1,9 +1,9 @@
 using Dsw2025Tpi.Application.Dtos;                   // Modelos DTO de la capa Application
 using Dsw2025Tpi.Application.Interfaces;             // Interfaces de servicios de la capa Application
 using Dsw2025Tpi.Application.Services;               // Implementaciones de servicios de la capa Application
-using Dsw2025Tpi.Data;                               // Contexto de datos del dominio
 using Dsw2025Tpi.Data.Context;                       // Contexto de autenticación (Identity)
 using Dsw2025Tpi.Data.Repositories;                  // Implementación de repositorios
+using Dsw2025Tpi.Data.Seeding;
 using Dsw2025Tpi.Domain.Interfaces;                  // Interfaces del dominio
 using Microsoft.AspNetCore.Authentication.JwtBearer; // Autenticación JWT
 using Microsoft.AspNetCore.Identity;                 // ASP.NET Core Identity
@@ -17,7 +17,7 @@ namespace Dsw2025Tpi.Api;
 
 public static class Program
 {
-      public static void Main(string[] args)
+      public static async Task Main(string[] args) // Lo hago async para poder ejecutar seeding con await
       {
             var builder = WebApplication.CreateBuilder(args);
             // Crea el objeto principal de configuración de la aplicación.
@@ -26,138 +26,110 @@ public static class Program
             // Expone "builder.Services" para registrar servicios en el contenedor de DI.
             // Expone "builder.Configuration" y "builder.Environment" para acceder a config y entorno.
 
-
             builder.Services.AddControllers();            // Registra los controladores de la API
             builder.Services.AddEndpointsApiExplorer();   // Permite que Swagger descubra los endpoints
 
             // Configura Swagger para documentar la API y habilitar autenticación JWT
             builder.Services.AddSwaggerGen(o =>
             {
-                  // Define la información básica del documento OpenAPI
                   o.SwaggerDoc("v1", new OpenApiInfo
                   {
-                        Title = "Desarrollo de Software", // Título que verá el usuario en Swagger UI
-                        Version = "v1",                   // Versión de la API documentada
+                        Title = "Desarrollo de Software",
+                        Version = "v1",
                   });
-
-                  // Define el esquema de seguridad para JWT Bearer
                   o.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                   {
-                        In = ParameterLocation.Header,    // El token se envía en el encabezado HTTP
-                        Name = "Authorization",           // Nombre del encabezado que contendrá el token
-                        Description = "Ingresar el token JWT con el formato: Bearer {token}", // Texto de ayuda
-                        Type = SecuritySchemeType.ApiKey  // Tipo API Key para que Swagger
-                                                          // muestre el campo de token
+                        In = ParameterLocation.Header,
+                        Name = "Authorization",
+                        Description = "Ingresar el token JWT con el formato: Bearer {token}",
+                        Type = SecuritySchemeType.ApiKey
                   });
-
-                  // Aplica el esquema a todas las operaciones protegidas
                   o.AddSecurityRequirement(new OpenApiSecurityRequirement
-                  {
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
                         {
-                              new OpenApiSecurityScheme
-                              {
-                                    Reference = new OpenApiReference // Referencia al esquema definido arriba
-                                    {
-                                          Type = ReferenceType.SecurityScheme,
-                                          Id = "Bearer"
-                                    }
-                              },
-                              Array.Empty<string>()                  // Sin scopes adicionales
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
                         }
-                  });
+                    },
+                    Array.Empty<string>()
+                }
+            });
             });
 
+            builder.Services.AddHealthChecks();
 
-            builder.Services.AddHealthChecks(); // Permite exponer un endpoint para
-                                                // verificar la salud de la API
-
-            // Configura Identity
             builder.Services.AddIdentity<IdentityUserCustomerDto, IdentityRole>(options =>
             {
                   options.Password = new PasswordOptions
                   {
-                        RequiredLength = 8,     // Longitud mínima de contraseña
+                        RequiredLength = 8,
                   };
             })
-
-            // Usa AuthenticateContext para persistir usuarios y roles
             .AddEntityFrameworkStores<AuthenticateContext>()
-
-            // Agrega proveedores de tokens por defecto (ej: para recuperación de contraseña)
             .AddDefaultTokenProviders();
 
-            // Lee la sección JWT de appsettings.json
             var jwtConfig = builder.Configuration.GetSection("Jwt");
-
-            // Lee la sección JWT de appsettings.json
             var keyText = jwtConfig["Key"] ?? throw new ArgumentException("JWT Key");
-
-            // Convierte la clave a bytes
             var key = Encoding.UTF8.GetBytes(keyText);
 
-            // Configura el esquema de autenticación predeterminado
             builder.Services.AddAuthentication(options =>
             {
-                  // Autenticación JWT
                   options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                  // Desafío JWT
                   options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-
-            // Configura autenticación JWT
             .AddJwtBearer(options =>
             {
                   options.TokenValidationParameters = new TokenValidationParameters
                   {
-                        ValidateIssuer = true,                           // Valida el emisor del token
-                        ValidateAudience = true,                         // Valida la audiencia del token
-                        ValidateLifetime = true,                         // Valida la expiración del token
-                        ValidateIssuerSigningKey = true,                 // Valida la firma del token
-                        ValidIssuer = jwtConfig["Issuer"],               // Emisor válido esperado
-                        ValidAudience = jwtConfig["Audience"],           // Audiencia válida esperada
-                        IssuerSigningKey = new SymmetricSecurityKey(key) // Clave usada para validar la firma
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwtConfig["Issuer"],
+                        ValidAudience = jwtConfig["Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(key)
                   };
             });
 
-            // Registra el contexto de datos del dominio
             builder.Services.AddDbContext<DomainContext>(options =>
-                  // Usa SQL Server
-                  options.UseSqlServer(builder.Configuration.GetConnectionString("ConectionString")));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("ConectionString")));
 
-            // Servicio de productos
             builder.Services.AddTransient<IProductsManagementsService, ProductsManagementsService>();
-            // Servicio de órdenes
             builder.Services.AddTransient<IOrderManagementsService, OrderManagementsService>();
-            // Servicio de clientes
             builder.Services.AddTransient<ICustomerManagmentsService, CustomerManagmentsService>();
-            // Repositorio genérico EF
             builder.Services.AddScoped<IRepository, EfRepository>();
-            // Servicio para generar JWT
             builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 
-            // Registra el contexto de autenticación
             builder.Services.AddDbContext<AuthenticateContext>(options =>
-                  // Usa SQL Server
-                  options.UseSqlServer(builder.Configuration.GetConnectionString("ConectionString")));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("ConectionString")));
 
             var app = builder.Build();
 
-            if (app.Environment.IsDevelopment()) // Solo en desarrollo habilita Swagger UI
+            if (app.Environment.IsDevelopment())
             {
-                  app.UseSwagger();              // Middleware para Swagger
-                  app.UseSwaggerUI();            // Interfaz gráfica de Swagger
+                  app.UseSwagger();
+                  app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection(); // Redirige automáticamente a HTTPS
+            app.UseHttpsRedirection();
+            app.UseAuthentication();
+            app.UseAuthorization();
+            app.MapControllers();
+            app.MapHealthChecks("/healthcheck");
 
-            app.UseAuthentication();   // Middleware de autenticación (debe ir antes que autorización)
+            // Ejecutamos el seeding de datos al iniciar la API
+            using (var scope = app.Services.CreateScope())
+            {
+                  var dataSeeder = scope.ServiceProvider.GetRequiredService<IDataSeeder>();
+                  await dataSeeder.SeedAsync();
+            }
 
-            app.UseAuthorization();    // Middleware de autorización
-
-            app.MapControllers();      // Mapea los controladores a rutas
-
-            app.MapHealthChecks("/healthcheck"); // Endpoint para verificar estado de la API
-
-            app.Run();                 // Inicia la aplicación
+#pragma warning disable S6966
+            app.Run();
+#pragma warning restore S6966
       }
 }
