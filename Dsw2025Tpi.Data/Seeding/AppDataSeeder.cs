@@ -71,6 +71,30 @@ public class AppDataSeeder : IDataSeedContributor, ITransientDependency
                       200.00m,
                       30
                   ));
+                  _domainContext.Products.Add(new Product(
+                      "SKU003",
+                      "INT003",
+                      "Producto de ejemplo 3",
+                      "Producto 3",
+                      150.75m,
+                      20
+                  ));
+                  _domainContext.Products.Add(new Product(
+                      "SKU004",
+                      "INT004",
+                      "Producto de ejemplo 4",
+                      "Producto 4",
+                      300.00m,
+                      10
+                  ));
+                  _domainContext.Products.Add(new Product(
+                      "SKU005",
+                      "INT005",
+                      "Producto de ejemplo 5",
+                      "Producto 5",
+                      250.00m,
+                      5
+                  ));
                   await _domainContext.SaveChangesAsync();
             }
       }
