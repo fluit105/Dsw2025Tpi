@@ -121,11 +121,14 @@ public static class Program
             app.MapControllers();
             app.MapHealthChecks("/healthcheck");
 
-            // Ejecutamos el seeding de datos al iniciar la API
-            using (var scope = app.Services.CreateScope())
+            // Ejecutamos el seeding de datos solo en modo Development
+            if (app.Environment.IsDevelopment())
             {
-                  var dataSeeder = scope.ServiceProvider.GetRequiredService<IDataSeeder>();
-                  await dataSeeder.SeedAsync();
+                  using (var scope = app.Services.CreateScope())
+                  {
+                        var dataSeeder = scope.ServiceProvider.GetRequiredService<IDataSeeder>();
+                        await dataSeeder.SeedAsync();
+                  }
             }
 
 #pragma warning disable S6966
