@@ -26,6 +26,25 @@ public static class Program
             // Expone "builder.Services" para registrar servicios en el contenedor de DI.
             // Expone "builder.Configuration" y "builder.Environment" para acceder a config y entorno.
 
+            // Definir un nombre para la política
+            const string CorsPolicyName = "CorsPolicy";
+
+            builder.Services.AddCors(options =>
+            {
+                  options.AddPolicy(CorsPolicyName, policy =>
+                  {
+                        policy
+                          .WithOrigins(
+                            "https://mi-frontend.com",      // dominio de producción
+                            "https://localhost:4200"       // dominio de desarrollo (Angular, React, etc.)
+                          )
+                          .AllowAnyHeader()                // permitir todos los encabezados que tu cliente necesite
+                          .AllowAnyMethod()                // permitir GET, POST, PUT, PATCH, DELETE…
+                          .AllowCredentials();             // solo si usas cookies o autenticación basada en credenciales
+                  });
+            });
+
+
             builder.Services.AddControllers();            // Registra los controladores de la API
             builder.Services.AddEndpointsApiExplorer();   // Permite que Swagger descubra los endpoints
 
@@ -116,6 +135,13 @@ public static class Program
             }
 
             app.UseHttpsRedirection();
+
+            // Sólo en producción habilitamos CORS
+            if (app.Environment.IsProduction())
+            {
+                  app.UseCors(CorsPolicyName);
+            }
+
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
