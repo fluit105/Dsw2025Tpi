@@ -12,13 +12,15 @@ using Microsoft.OpenApi.Models;                      // Swagger y OpenAPI
 using System.Text;                                   // Codificación para claves JWT
 using System.Threading.RateLimiting;                 // Limitación de tasa para proteger la API
 using Microsoft.AspNetCore.RateLimiting;             // Limitación de tasa para ASP.NET Core
-using AspNetCoreRateLimit;                           // Biblioteca para limitación de tasa por IP
+using AspNetCoreRateLimit;
+using System.Text.Json;
+using Dsw2025Tpi.Domain.Domain;
 
 namespace Dsw2025Tpi.Api;
 
 public static class Program
 {
-      public static void Main(string[] args) // Lo hago async para poder ejecutar seeding con await
+      public static async Task Main(string[] args) // Lo hago async para poder ejecutar seeding con await
       {
             var builder = WebApplication.CreateBuilder(args);
             // Crea el objeto principal de configuración de la aplicación.
@@ -176,6 +178,35 @@ public static class Program
             app.UseAuthorization();
             app.MapControllers();
             app.MapHealthChecks("/healthcheck");
+
+            // JSON seeding solo en Development
+            if (app.Environment.IsDevelopment())
+            {
+                  using var scope = app.Services.CreateScope();
+                  var db = scope.ServiceProvider.GetRequiredService<DomainContext>();
+
+                  // 1) Clientes
+                  var clientsJson = await File.ReadAllTextAsync(
+                      Path.Combine(app.Environment.ContentRootPath, "SeedData", "customers.json"));
+                  var clients = JsonSerializer.Deserialize<List<Customer>>(clientsJson)!;
+                  foreach (var c in clients)
+                  {
+                        if (!await db.Customers.AnyAsync(x => x.Email == c.Email))
+                              db.Customers.Add(c);
+                  }
+
+                  // 2) Productos
+                  var productsJson = await File.ReadAllTextAsync(
+                      Path.Combine(app.Environment.ContentRootPath, "SeedData", "products.json"));
+                  var products = JsonSerializer.Deserialize<List<Product>>(productsJson)!;
+                  foreach (var p in products)
+                  {
+                        if (!await db.Products.AnyAsync(x => x.Sku == p.Sku))
+                              db.Products.Add(p);
+                  }
+
+                  await db.SaveChangesAsync();
+            }
 
 #pragma warning disable S6966
             app.Run();
