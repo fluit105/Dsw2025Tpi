@@ -1,0 +1,42 @@
+[
+      {
+            "Sku": "SKU001",
+            "InternalCode": "INT001",
+            "Name": "Producto Alfa",
+            "Description": "Descripción del Producto Alfa",
+            "CurrentUnitPrice": 12.50,
+            "StockQuantity": 100
+      },
+      {
+            "Sku": "SKU002",
+            "InternalCode": "INT002",
+            "Name": "Producto Beta",
+            "Description": "Descripción del Producto Beta",
+            "CurrentUnitPrice": 7.99,
+            "StockQuantity": 200
+      },
+      {
+            "Sku": "SKU003",
+            "InternalCode": "INT003",
+            "Name": "Producto Gamma",
+            "Description": "Descripción del Producto Gamma",
+            "CurrentUnitPrice": 5.00,
+            "StockQuantity": 150
+      },
+      {
+            "Sku": "SKU004",
+            "InternalCode": "INT004",
+            "Name": "Producto Delta",
+            "Description": "Descripción del Producto Delta",
+            "CurrentUnitPrice": 20.00,
+            "StockQuantity": 75
+      },
+      {
+            "Sku": "SKU005",
+            "InternalCode": "INT005",
+            "Name": "Producto Épsilon",
+            "Description": "Descripción del Producto Épsilon",
+            "CurrentUnitPrice": 15.75,
+            "StockQuantity": 50
+      }
+]

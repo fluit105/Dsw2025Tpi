@@ -29,4 +29,13 @@
 		</None>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Update="SeedData\customers.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="SeedData\products.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
 </Project>

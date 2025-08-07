@@ -51,7 +51,13 @@ Para preparar el entorno de desarrollo y ejecutar la API en su máquina local, s
 
    > **Seguridad:** Asegúrese de agregar `appsettings.Development.json` a `.gitignore` para evitar exponer claves sensibles de JWT. Solo incluya `appsettings.json` en el control de versiones con valores dummy.
 
-4. **Aplicación de migraciones y poblado inicial de datos**
+4. **Restaurar los paquetes NuGet**
+
+   ```bash
+   dotnet restore
+   ```
+
+5. **Aplicación de migraciones y poblado inicial de datos**
    Ejecute las migraciones de Entity Framework Core y permita que el seeder inserte datos de ejemplo:
 
    ```bash
@@ -68,14 +74,11 @@ Para preparar el entorno de desarrollo y ejecutar la API en su máquina local, s
      --context AuthenticateContext
    ```
 
-   > **Nota:** Al iniciar la aplicación, `AppDataSeeder` ejecuta la inserción de roles, usuarios de prueba, productos y órdenes de ejemplo.
-
-5. **Ejecución de la API**
+6. **Ejecución de la API**
    Inicie el host ASP.NET Core:
 
    ```bash
-   cd Dsw2025Tpi.Api
-   dotnet run
+   dotnet run --project Dsw2025Tpi.Api
    ```
 
    * Accesos: `https://localhost:5001` y `http://localhost:5000`.
