@@ -109,8 +109,8 @@ public class ProductsManagementsService : IProductsManagementsService
       // Valida los datos básicos del producto.
       private bool IsValid(ProductModelDto.ProductRequestWithDescription request)
       {
-            return string.IsNullOrWhiteSpace(request.Sku) &&
-                   string.IsNullOrWhiteSpace(request.Name) &&
+            return !string.IsNullOrWhiteSpace(request.Sku) &&
+                   !string.IsNullOrWhiteSpace(request.Name) &&
                    request.Price > 0 &&
                    request.Stock >= 1;
       }

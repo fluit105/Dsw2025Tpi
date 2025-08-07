@@ -205,6 +205,18 @@ public static class Program
                               db.Products.Add(p);
                   }
 
+                  // 3) Roles
+                  var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                  string[] roleNames = { "Admin", "Customer" };
+
+                  foreach (var roleName in roleNames)
+                  {
+                        if (!await roleManager.RoleExistsAsync(roleName))
+                        {
+                              await roleManager.CreateAsync(new IdentityRole(roleName));
+                        }
+                  }
+
                   await db.SaveChangesAsync();
             }
 
