@@ -12,9 +12,9 @@ using Microsoft.OpenApi.Models;                      // Swagger y OpenAPI
 using System.Text;                                   // Codificación para claves JWT
 using System.Threading.RateLimiting;                 // Limitación de tasa para proteger la API
 using Microsoft.AspNetCore.RateLimiting;             // Limitación de tasa para ASP.NET Core
-using AspNetCoreRateLimit;
-using System.Text.Json;
-using Dsw2025Tpi.Domain.Domain;
+using AspNetCoreRateLimit;                           // Limitación de tasa avanzada (si se necesita)
+using System.Text.Json;                              // Serialización JSON para seeding
+using Dsw2025Tpi.Domain.Domain;                      // Entidades del dominio
 
 namespace Dsw2025Tpi.Api;
 
