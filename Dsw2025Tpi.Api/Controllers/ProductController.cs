@@ -41,7 +41,8 @@ public class ProductController : ControllerBase
             }
       }
 
-      [HttpGet] // GET /api/products → obtiene todos los productos
+      [AllowAnonymous] // Cualquier persona puede consultar el catálogo
+      [HttpGet]        // GET /api/products → obtiene todos los productos
       public async Task<IActionResult> GetAllProducts()
       {
             try
@@ -58,6 +59,7 @@ public class ProductController : ControllerBase
             }
       }
 
+      [AllowAnonymous] // Cualquier persona puede buscar un producto por ID
       [HttpGet("{id}")] // GET /api/products/{id} → obtiene un producto por su ID
       public async Task<IActionResult> GetProductById(Guid id)
       {
