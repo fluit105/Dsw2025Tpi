@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.RateLimiting;             // Limitación de tasa para 
 using AspNetCoreRateLimit;                           // Limitación de tasa avanzada (si se necesita)
 using System.Text.Json;                              // Serialización JSON para seeding
 using Dsw2025Tpi.Domain.Domain;                      // Entidades del dominio
+using Dsw2025Tpi.Api.Middleware;                     // Importa el middleware
 
 namespace Dsw2025Tpi.Api;
 
@@ -158,26 +159,67 @@ public static class Program
             builder.Services.AddDbContext<AuthenticateContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("ConectionString")));
 
-            var app = builder.Build();
+        
+
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy(name: CorsPolicyName,
+                policy =>
+                {
+                    policy.WithOrigins("http://localhost:5173") // puerto de Vite
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+                });
+        });
+
+
+
+        var app = builder.Build();
 
             if (app.Environment.IsDevelopment())
             {
-                  app.UseSwagger();
-                  app.UseSwaggerUI();
+                  // Mantener para desarrollo
             }
+        app.UseSwagger();
+        app.UseSwaggerUI(c =>
+        {
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "Desarrollo de Software v1");
+            c.RoutePrefix = "swagger"; // o `string.Empty` si querés servirlo en la raíz
+        });
+        app.UseStatusCodePages(async context =>
+        {
+            var response = context.HttpContext.Response;
 
+            if (response.StatusCode == 401 || response.StatusCode == 403)
+            {
+                response.ContentType = "application/json";
+
+                var payload = new
+                {
+                    error = response.StatusCode == 401 ? "No estás autenticado." : "No tenés permisos para acceder.",
+                    type = "AuthenticationException",
+                    status = response.StatusCode,
+                    traceId = context.HttpContext.TraceIdentifier
+                };
+
+                await response.WriteAsync(JsonSerializer.Serialize(payload));
+            }
+        });
+
+        app.UseMiddleware<ExceptionHandlerMiddleware>();
             app.UseHttpsRedirection();
 
             // Sólo en producción habilitamos CORS
-            if (app.Environment.IsProduction())
-            {
+            
                   app.UseCors(CorsPolicyName);
-            }
+            
 
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
             app.MapHealthChecks("/healthcheck");
+
 
             // JSON seeding solo en Development
             if (app.Environment.IsDevelopment())

@@ -19,9 +19,18 @@ namespace Dsw2025Tpi.Application.Interfaces
             // Devuelve una colección de entidades de dominio Product.
             Task<IEnumerable<Product>?> GetAllProducts();
 
-            // Busca un producto por su identificador único.
-            // Devuelve la entidad encontrada o null si no existe.
-            Task<Product?> GetProductById(Guid id);
+
+        Task<ProductModelDto.ResponsePagination?> GetProducts(ProductModelDto.FilterProduct request);
+
+        Task<int> GetProductCountAsync();
+
+        Task<IEnumerable<Product>> SearchProducts(string term);
+
+
+
+        // Busca un producto por su identificador único.
+        // Devuelve la entidad encontrada o null si no existe.
+        Task<Product?> GetProductById(Guid id);
 
             // Busca un producto por su SKU (código único).
             // Devuelve la entidad encontrada o null si no existe.

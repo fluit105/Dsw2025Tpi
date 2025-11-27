@@ -29,8 +29,15 @@ public record OrderModelDto
           int? pagesize
       );
 
-      // Respuesta que devuelve la API con información detallada de una orden.
-      public record OrderResponse(
+    public record OrderFilterRequestName(
+        OrderStatus? OrderStatus,
+        string? CustomerName,
+        int? pageNumber,
+        int? pagesize
+    );
+
+    // Respuesta que devuelve la API con información detallada de una orden.
+    public record OrderResponse(
           Guid customerId,
           Guid OrderId,
           DateTime date,
@@ -41,4 +48,27 @@ public record OrderModelDto
           List<OrderItemsModelDto.OrderItemResponse> OrderItems,
           OrderStatus OrderStatus
       );
+    public record OrderReadResponse(
+    string CustomerName,
+    Guid OrderId,
+    DateTime Date,
+    string ShippingAddress,
+    string BillingAddress,
+    string Notes,
+    decimal TotalAmount,
+    List<OrderItemsModelDto.OrderItemResponse> OrderItems,
+    OrderStatus OrderStatus
+);
+
+    public record OrderReadListResponse(
+        int Total,
+        List<OrderReadResponse> Orders
+    );
+
+
+    public record OrderListResponse(
+        int Total,
+        List<OrderResponse> OrderItems 
+    );
+
 }

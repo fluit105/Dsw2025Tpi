@@ -12,104 +12,99 @@ namespace Dsw2025Tpi.Api.Controllers;
 [ApiController] // Habilita comportamiento automático de API REST
 public class ProductController : ControllerBase
 {
-      private readonly IProductsManagementsService _service;
+    private readonly IProductsManagementsService _service;
 
-      public ProductController(IProductsManagementsService service)
-      {
-            _service = service;
-      }
+    public ProductController(IProductsManagementsService service)
+    {
+        _service = service;
+    }
 
-      [HttpPost] // POST /api/products → crea un nuevo producto
-      public async Task<IActionResult> AddProduct([FromBody] ProductModelDto.ProductRequestWithDescription request)
-      {
-            try
-            {
-                  var product = await _service.AddProduct(request);
-                  return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
-            }
-            catch (ArgumentException ae) // Datos inválidos
-            {
-                  return BadRequest(ae.Message);
-            }
-            catch (DuplicatedEntityException de) // SKU duplicado
-            {
-                  return Conflict(de.Message);
-            }
-            catch (Exception) // Error inesperado
-            {
-                  return Problem("An error occurred while saving the product");
-            }
-      }
+    [HttpPost] // POST /api/products → crea un nuevo producto
+    public async Task<IActionResult> AddProduct([FromBody] ProductModelDto.ProductRequestWithDescription request)
+    {
+        var product = await _service.AddProduct(request);
+        return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
+    }
 
-      [AllowAnonymous] // Cualquier persona puede consultar el catálogo
-      [HttpGet]        // GET /api/products → obtiene todos los productos
-      public async Task<IActionResult> GetAllProducts()
-      {
-            try
-            {
-                  var products = await _service.GetAllProducts();
-                  if (products == null || !products.Any())
-                        return NoContent(); // No hay productos
+    [AllowAnonymous] // Cualquier persona puede consultar el catálogo
+    [HttpGet]        // GET /api/products → obtiene todos los productos
+    public async Task<IActionResult> GetAllProducts()
+    {
+        var products = await _service.GetAllProducts();
+        if (products == null || !products.Any())
+            return NoContent(); // No hay productos
 
-                  return Ok(products); // Lista de productos
-            }
-            catch (Exception)
-            {
-                  return Problem("An error occurred while retrieving the products");
-            }
-      }
+        return Ok(products); // Lista de productos
+    }
 
-      [AllowAnonymous] // Cualquier persona puede buscar un producto por ID
-      [HttpGet("{id}")] // GET /api/products/{id} → obtiene un producto por su ID
-      public async Task<IActionResult> GetProductById(Guid id)
-      {
-            try
-            {
-                  var product = await _service.GetProductById(id);
-                  if (product == null)
-                        return NotFound(); // No existe
+    [HttpGet("admin")]
+    //[Authorize(Roles = "ADMIN")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetAuthProducts([FromQuery] ProductModelDto.FilterProduct request)
+    {
+        var products = await _service.GetProducts(request);
 
-                  return Ok(product); // Producto encontrado
-            }
-            catch (Exception)
-            {
-                  return Problem("An error occurred while retrieving the product");
-            }
-      }
+        if (products == null || !products.ProductItems.Any())
+        {
+            Response.Headers.Append("X-Message", "No hay productos activos");
+            return NoContent();
+        }
 
-      [HttpPut("{id}")] // PUT /api/products/{id} → actualiza un producto
-      public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] ProductModelDto.ProductRequestWithDescription request)
-      {
-            try
-            {
-                  var product = await _service.GetProductById(id);
-                  if (product == null)
-                        return NotFound(); // No existe
+        return Ok(products);
+    }
 
-                  await _service.ModifyProduct(product, request);
-                  return NoContent(); // Actualización exitosa sin contenido
-            }
-            catch (Exception)
-            {
-                  return Problem("An error occurred while updating the product");
-            }
-      }
+    [HttpGet("count")]
+    public async Task<IActionResult> GetProductCount()
+    {
+        var count = await _service.GetProductCountAsync();
+        return Ok(count);
+    }
 
-      [HttpPatch("{id}")] // PATCH /api/products/{id} → alterna estado activo/inactivo
-      public async Task<IActionResult> PatchProductIsActive(Guid id)
-      {
-            try
-            {
-                  var product = await _service.GetProductById(id);
-                  if (product == null)
-                        return NotFound(); // No existe
+    [AllowAnonymous] // Cualquier persona puede buscar un producto por ID
+    [HttpGet("{id}")] // GET /api/products/{id} → obtiene un producto por su ID
+    public async Task<IActionResult> GetProductById(Guid id)
+    {
+        var product = await _service.GetProductById(id);
+        if (product == null)
+            return NotFound(); // No existe
 
-                  await _service.PatchProductIsActive(product);
-                  return NoContent(); // Cambió el estado
-            }
-            catch (Exception)
-            {
-                  return Problem("An error occurred while patching the product");
-            }
-      }
+        return Ok(product); // Producto encontrado
+
+    }
+    [AllowAnonymous]
+    [HttpGet("search")]
+    public async Task<IActionResult> SearchProducts([FromQuery] string term)
+    {
+        if (string.IsNullOrWhiteSpace(term))
+            return BadRequest("Debe ingresar un término de búsqueda");
+
+        var products = await _service.SearchProducts(term);
+
+        if (products == null || !products.Any())
+            return NoContent();
+
+        return Ok(products);
+    }
+
+    [HttpPut("{id}")] // PUT /api/products/{id} → actualiza un producto
+    public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] ProductModelDto.ProductRequestWithDescription request)
+    {
+        var product = await _service.GetProductById(id);
+        if (product == null)
+            return NotFound(); // No existe
+
+        await _service.ModifyProduct(product, request);
+        return NoContent(); // Actualización exitosa sin contenido
+    }
+
+    [HttpPatch("{id}")] // PATCH /api/products/{id} → alterna estado activo/inactivo
+    public async Task<IActionResult> PatchProductIsActive(Guid id)
+    {
+        var product = await _service.GetProductById(id);
+        if (product == null)
+            return NotFound(); // No existe
+
+        await _service.PatchProductIsActive(product);
+        return NoContent(); // Cambió el estado
+    }
 }

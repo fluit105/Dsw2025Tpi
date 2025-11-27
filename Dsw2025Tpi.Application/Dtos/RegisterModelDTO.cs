@@ -13,5 +13,7 @@ public record RegisterModelDto(
 
     string Name,
 
-    string PhoneNumber
+    string PhoneNumber,
+
+    string Role
 );

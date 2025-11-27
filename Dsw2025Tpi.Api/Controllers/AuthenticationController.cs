@@ -61,6 +61,7 @@ public class AuthenticationController : ControllerBase
             if (!result.Succeeded)
                   return Unauthorized("Invalid username or password."); // Contraseña incorrecta
 
+
             // Obtener el rol real del usuario
             var roles = await _userManager.GetRolesAsync(user);
             var role = roles.FirstOrDefault() ?? "";
@@ -69,7 +70,12 @@ public class AuthenticationController : ControllerBase
             var token = _jwtTokenService.GenerateToken(user.UserName!, role);
 
             // Responder con el token para que el cliente lo use en futuras peticiones protegidas
-            return Ok(new { Token = token });
+            return Ok(new
+            {
+                Token = token,
+                Role = role,
+                CustomerId = user.CustomerId
+            });
       }
 
       [HttpPost("register")] // Indica que este endpoint responde a POST en /api/auth/register
@@ -104,11 +110,14 @@ public class AuthenticationController : ControllerBase
             if (!result.Succeeded)
                   return BadRequest(result.Errors);
 
-            // Asignar rol por defecto al usuario recién registrado
-            // Esto asegura que en el login podamos devolver el rol real en el token
-            await _userManager.AddToRoleAsync(user, "Customer");
+        // Asignar rol por defecto al usuario recién registrado
+        // Esto asegura que en el login podamos devolver el rol real en el token
+        if (registerModel.Role == "Admin" || registerModel.Role == "Customer")
+            await _userManager.AddToRoleAsync(user, registerModel.Role);
+        else
+            return BadRequest("Rol inválido. Solo se permiten 'Admin' o 'Customer'.");
 
-            // Si todas las cosas salen bien, devolverá mensaje de éxito
-            return Ok("User registered successfully.");
+        // Si todas las cosas salen bien, devolverá mensaje de éxito
+        return Ok("User registered successfully.");
       }
 }

@@ -22,6 +22,13 @@ namespace Dsw2025Tpi.Application.Interfaces
 
             // Obtiene una lista de órdenes aplicando filtros opcionales (estado, cliente, paginación).
             // Devuelve una lista de DTOs de respuesta listos para la API.
-            Task<List<OrderModelDto.OrderResponse>> GetAllOrdersFilter(OrderModelDto.OrderFilterRequest request);
-      }
+            Task<List<OrderModelDto.OrderResponse>> GetAllOrdersFilters(OrderModelDto.OrderFilterRequest request);
+
+        Task<OrderModelDto.OrderListResponse> GetAllOrdersFilter(OrderModelDto.OrderFilterRequest request);
+
+
+        Task<OrderModelDto.OrderReadListResponse> GetAllOrdersWithCustomerName(OrderModelDto.OrderFilterRequestName request);
+
+        Task<int> GetOrderCountAsync();
+    }
 }

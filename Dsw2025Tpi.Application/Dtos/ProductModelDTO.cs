@@ -12,7 +12,6 @@ public record ProductModelDto
           Guid id,
           int quantity,
           string name,
-          string description,
           decimal currentunitPrice
       );
 
@@ -40,4 +39,20 @@ public record ProductModelDto
           decimal Stock,
           bool IsActive
       );
+
+    public record FilterProduct(string? Status, string? Search, int? PageNumber, int? PageSize);
+
+    public record ResponseProduct(
+        Guid Id,
+        string? Sku,
+        string? InternalCode,
+        string? Name,
+        string? Description,
+        decimal? CurrentUnitPrice,
+        int? StockQuantity,
+        bool IsActive
+    );
+
+    public record ResponsePagination(List<ResponseProduct> ProductItems, int Total);
+
 }
