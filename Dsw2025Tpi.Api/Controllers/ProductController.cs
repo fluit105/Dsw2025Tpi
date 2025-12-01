@@ -107,4 +107,19 @@ public class ProductController : ControllerBase
         await _service.PatchProductIsActive(product);
         return NoContent(); // Cambió el estado
     }
+    [AllowAnonymous] // Permite el acceso público al catálogo activo
+    [HttpGet("active/paginated")] // Nuevo endpoint
+    public async Task<IActionResult> GetActiveProductsPaginated([FromQuery] ProductModelDto.FilterProduct request)
+    {
+        // El 'request' recibe los parámetros de paginación (PageNumber, PageSize, Search)
+        var products = await _service.GetActiveProductsPaginated(request);
+
+        if (products == null || !products.ProductItems.Any())
+        {
+            Response.Headers.Append("X-Message", "No hay productos activos que coincidan con los filtros");
+            return NoContent(); // 204 No Content si no hay resultados
+        }
+
+        return Ok(products); // 200 OK con la respuesta paginada (ResponsePagination DTO)
+    }
 }

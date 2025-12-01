@@ -190,6 +190,17 @@ public class ProductsManagementsService : IProductsManagementsService
 
         return new ProductModelDto.ResponsePagination(paged, projected.Count);
     }
+    public async Task<ProductModelDto.ResponsePagination?> GetActiveProductsPaginated(ProductModelDto.FilterProduct request)
+    {
+        // Creamos una nueva instancia del DTO de filtro para evitar modificar la original
+        // y forzamos el Status a "enabled" (activo), rehusando el campo de búsqueda y paginación.
+        var activeFilter = request with
+        {
+            Status = "enabled" // Forzamos el estado a activo, que tu GetProducts ya sabe interpretar.
+        };
 
-    
+        // Llamamos al método de paginación existente con el filtro modificado.
+        return await GetProducts(activeFilter);
+    }
+
 }

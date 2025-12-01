@@ -26,7 +26,7 @@ namespace Dsw2025Tpi.Application.Interfaces
 
         Task<IEnumerable<Product>> SearchProducts(string term);
 
-
+        Task<ProductModelDto.ResponsePagination?> GetActiveProductsPaginated(ProductModelDto.FilterProduct request);
 
         // Busca un producto por su identificador único.
         // Devuelve la entidad encontrada o null si no existe.
